@@ -27,6 +27,7 @@ class Movie(models.Model):
     def __str__(self) -> str:
         return self.title
 
+
 class User(AbstractUser):
     pass
 
@@ -78,7 +79,6 @@ class Ticket(models.Model):
     row = models.IntegerField()
     seat = models.IntegerField()
 
-
     def __str__(self) -> str:
         return f"{self.movie_session} (row: {self.row}, seat: {self.seat})"
 
@@ -90,20 +90,21 @@ class Ticket(models.Model):
             )
         ]
 
-
-    def clean(self):
+    def clean(self) -> None:
         hall = self.movie_session.cinema_hall
 
         errors = {}
 
         if self.row < 1 or self.row > hall.rows:
-            errors['row'] = [
-                f"row number must be in available range: (1, rows): (1, {hall.rows})"
+            errors["row"] = [
+                f"row number must be in available range: (1, rows): "
+                f"(1, {hall.rows})"
             ]
 
         if self.seat < 1 or self.seat > hall.seats_in_row:
-            errors['seat'] = [
-                f"seat number must be in available range: (1, seats_in_row): (1, {hall.seats_in_row})"
+            errors["seat"] = [
+                f"seat number must be in available range: "
+                f"(1, seats_in_row): (1, {hall.seats_in_row})"
             ]
 
         if Ticket.objects.filter(
@@ -111,17 +112,13 @@ class Ticket(models.Model):
                 row=self.row,
                 seat=self.seat
         ).exclude(pk=self.pk).exists():
-            errors['seat_is_already_exists'] = [
+            errors["seat_is_already_exists"] = [
                 f"seat {self.seat} in row {self.row} is already taken"
             ]
 
         if errors:
             raise ValidationError(errors)
 
-
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs) -> None:
         self.full_clean()
         super().save(*args, **kwargs)
-
-
-
