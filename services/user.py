@@ -34,7 +34,7 @@ def update_user(
         first_name: str | None = None,
         last_name: str | None = None
 ) -> User:
-    user = User.objects.get(id=user_id)
+    user = get_user(user_id)
     if password:
         user.set_password(password)
     if username:
